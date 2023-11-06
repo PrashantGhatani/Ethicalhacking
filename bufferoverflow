@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Define the vulnerable C/C++ program and its source code
+vulnerable_program="./vulnerable_program"
+source_code="./vulnerable_code.c"
+
+# Compile the vulnerable program
+gcc -o "$vulnerable_program" "$source_code"
+
+# Directory structure for AFL
+afl_dir="/path/to/afl"
+input_dir="/path/to/input"
+output_dir="/path/to/output"
+
+# Create AFL working directories
+mkdir -p "$input_dir" "$output_dir"
+
+# Define the AFL executable
+afl_executable="$afl_dir/afl-fuzz"
+
+# Define the number of AFL instances to run in parallel
+num_instances=4
+
+# Fuzzing options
+timeout="10s"  # Set the timeout for each test case execution
+
+# Run AFL instances in parallel
+for ((i = 0; i < num_instances; i++)); do
+    $afl_executable -i "$input_dir" -o "$output_dir/instance_$i" -x "$afl_dir/dictionary.txt" -Q -- "$vulnerable_program" @@
+done
+
+# Monitor AFL instances and collect results
+for ((i = 0; i < num_instances; i++)); do
+    $afl_executable -i "$input_dir" -o "$output_dir/instance_$i" -x "$afl_dir/dictionary.txt" -Q -- "$vulnerable_program" @@ &
+done
+
+# Analyze results and crashes (you may need to adjust the paths accordingly)
+for ((i = 0; i < num_instances; i++)); do
+    afl-whatsup "$output_dir/instance_$i"
+done
