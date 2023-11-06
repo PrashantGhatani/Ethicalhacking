@@ -1,0 +1,19 @@
+#!/bin/bash
+
+target_ip="192.168.1.1-254"
+output_dir="/path/to/output/directory"
+
+nmap -p 1-65535 -T4 -A -oA $output_dir/nmap_scan $target_ip
+
+gsad --xml="$output_dir/openvas_report.xml" --username="username" --password="password"
+
+# Optionally, you can automate the login to gsad using gvm-cli
+# Install gvm-cli: https://github.com/greenbone/gvm-tools
+# gvm-cli socket --gmp-username "username" --gmp-password "password" --xml="$output_dir/openvas_report.xml" socket --unix-socket=/var/run/gvmd.sock --gmp-username "username" --gmp-password "password" tls --hostname 127.0.0.1 --xml="$output_dir/openvas_report.xml"
+
+# Process and analyze the results (e.g., using GVM-CLI, OSPD, or custom scripts).
+
+# Clean up temporary files if needed
+# rm $output_dir/nmap_scan.gnmap $output_dir/nmap_scan.nmap
+
+echo "Network vulnerability scanning complete. Results are saved in $output_dir"
