@@ -1,0 +1,130 @@
+
+Nmap Advanced Cheat Sheet
+
+Basic Scanning Techniques:
+---------------------------
+1. Scan single target: 
+   nmap [target] 
+   # Replace [target] with the IP address or hostname of the target machine.
+
+2. Scan multiple targets:
+   nmap [target1] [target2] [target3] ...
+   # You can specify multiple targets separated by spaces.
+
+3. Scan entire subnet:
+   nmap [subnet] 
+   # Replace [subnet] with the CIDR notation for the subnet (e.g., 192.168.1.0/24).
+
+4. Scan multiple subnets:
+   nmap [subnet1] [subnet2] [subnet3] ...
+   # You can specify multiple subnets separated by spaces.
+
+5. Scan specific ports:
+   nmap -p [ports] [target] 
+   # Replace [ports] with a comma-separated list of port numbers or port ranges.
+
+6. Scan all ports:
+   nmap -p- [target] 
+   # This scans all 65535 ports.
+
+7. TCP SYN Scan (Stealth Scan):
+   nmap -sS [target] 
+   # Uses SYN packets to determine open ports without establishing a full connection.
+
+8. TCP Connect Scan:
+   nmap -sT [target] 
+   # Performs a full TCP connection to each port.
+
+9. UDP Scan:
+   nmap -sU [target] 
+   # Scans for open UDP ports.
+
+Advanced Techniques:
+--------------------
+10. OS Detection:
+    nmap -O [target] 
+    # Attempts to determine the operating system of the target.
+
+11. Service Version Detection:
+    nmap -sV [target] 
+    # Attempts to determine the version of services running on open ports.
+
+12. Aggressive Scan:
+    nmap -A [target] 
+    # Enables OS detection, version detection, script scanning, and traceroute.
+
+13. TCP ACK Scan:
+    nmap -sA [target] 
+    # Determines if ports are filtered or unfiltered.
+
+14. TCP Window Scan:
+    nmap -sW [target] 
+    # Determines if ports are open, closed, or filtered.
+
+15. TCP NULL Scan:
+    nmap -sN [target] 
+    # Sends TCP packets with no flags set.
+
+16. TCP FIN Scan:
+    nmap -sF [target] 
+    # Sends TCP packets with only the FIN flag set.
+
+17. TCP Xmas Scan:
+    nmap -sX [target] 
+    # Sends TCP packets with the FIN, PSH, and URG flags set.
+
+Output Options:
+----------------
+18. Save results to file:
+    nmap -oN [filename] [target] 
+    # Saves results in normal format to the specified file.
+
+19. Save results in XML format:
+    nmap -oX [filename.xml] [target] 
+    # Saves results in XML format to the specified file.
+
+20. Save results in grepable format:
+    nmap -oG [filename.txt] [target] 
+    # Saves results in grepable format to the specified file.
+
+Miscellaneous:
+---------------
+21. Disable DNS resolution:
+    nmap -n [target] 
+    # Disables DNS resolution for faster scanning.
+
+22. Enable aggressive timing:
+    nmap -T4 [target] 
+    # Sets timing template to aggressive.
+
+23. Perform a fast scan:
+    nmap -F [target] 
+    # Scans only the most common ports.
+
+24. Increase verbosity:
+    nmap -v [target] 
+    # Increases verbosity level for more detailed output.
+
+25. Use a specific network interface:
+    nmap -e [interface] [target] 
+    # Specifies the network interface to use.
+
+26. Use a decoy IP:
+    nmap -D RND:10 [target] 
+    # Adds decoy IPs to hide the true source of the scan.
+
+27. Scan using IPv6:
+    nmap -6 [target] 
+    # Performs the scan using IPv6.
+
+28. Disable ping:
+    nmap -Pn [target] 
+    # Disables ICMP echo requests.
+
+29. Scan using a proxy:
+    nmap --proxy [proxy_address:port] [target] 
+    # Performs the scan through a proxy server.
+
+30. Perform a stealth scan:
+    nmap -sS -Pn -n -T4 --spoof-mac [MAC_address] [target] 
+    # Performs a stealth scan with various options to avoid detection.
